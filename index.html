@@ -5,38 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rede Nacional Hometech - Conserto e Tecnologia</title>
     
-    <!-- --- META TAGS PARA REDES SOCIAIS (WHATSAPP/FACEBOOK) --- -->
     <meta name="description" content="Entre para a Rede Nacional Hometech. Torne-se um Técnico Fundador da maior rede de assistência técnica do Brasil. Ganhe até R$ 400/dia.">
     <meta name="keywords" content="conserto secador, curso conserto, assistência técnica, trabalho em casa, renda extra, franquia barata">
     
-    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://hometech-site.vercel.app/">
     <meta property="og:title" content="Rede Nacional Hometech - Ganhe até R$ 400/dia">
     <meta property="og:description" content="Aprenda uma profissão em casa e entre para a maior rede de técnicos do Brasil. Vagas limitadas para fundadores.">
-    <!-- A imagem abaixo é a que vai aparecer no WhatsApp. Alterada para a foto do técnico com crachá -->
     <meta property="og:image" content="https://hometech-site.vercel.app/assets/foto-tecnico-cracha.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://hometech-site.vercel.app/">
     <meta property="twitter:title" content="Rede Nacional Hometech - Ganhe até R$ 400/dia">
     <meta property="twitter:description" content="Aprenda uma profissão em casa e entre para a maior rede de técnicos do Brasil. Vagas limitadas para fundadores.">
     <meta property="twitter:image" content="https://hometech-site.vercel.app/assets/foto-tecnico-cracha.jpg">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Fontes e Estilos Personalizados -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -76,7 +68,7 @@
         const NOME_ARQUIVO_VIDEO = "assets/video-capa.mp4";
         const NOME_ARQUIVO_VIDEO_BANCADA = "assets/video-bancada-nova.mp4"; 
         
-        const NOME_FOTO_HERO = "assets/foto-hero.webp";       
+        const NOME_FOTO_HERO = "assets/foto-hero.webp";        
         const NOME_FOTO_BANCADA = "assets/foto-bancada.webp"; 
         const NOME_FOTO_DEPOIMENTO = "assets/foto-depoimento.webp"; 
         const NOME_FOTO_ROMULO = "assets/foto-romulo.JPG";
@@ -335,6 +327,51 @@
             );
         };
 
+        // --- NOVO COMPONENTE: SEÇÃO DO CRIADOR ---
+        const CreatorSection = () => {
+            return (
+                <section className="py-20 bg-blue-50 relative overflow-hidden">
+                    <div className="container mx-auto px-4 relative z-10">
+                        <div className="flex flex-col md:flex-row items-center gap-12">
+                            <div className="w-full md:w-1/2 flex justify-center md:justify-end">
+                                <div className="relative group">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-orange-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                                    <img src={NOME_FOTO_ROMULO} alt="Rômulo Vander - Fundador" className="relative w-full max-w-md rounded-2xl shadow-2xl border border-white/50 object-cover" onError={(e) => e.target.src = FALLBACK_IMAGES.romulo} />
+                                    <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur text-blue-900 px-4 py-2 rounded-lg shadow-lg">
+                                        <p className="font-extrabold text-2xl">200.000+</p>
+                                        <p className="text-xs uppercase font-bold tracking-wider">Aparelhos Reparados</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="w-full md:w-1/2 text-left space-y-6">
+                                <div>
+                                    <span className="text-orange-600 font-bold tracking-wider uppercase text-sm">Quem é o criador?</span>
+                                    <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-2">Conheça Rômulo Vander</h2>
+                                </div>
+                                <p className="text-lg text-gray-600 leading-relaxed">
+                                    Com mais de <strong>25 anos de experiência de bancada</strong>, Rômulo não é apenas um professor, é um técnico de campo. Ele desenvolveu o Método Hometech para que qualquer pessoa, mesmo sem conhecimento prévio, pudesse consertar secadores com segurança e rapidez.
+                                </p>
+                                <div className="space-y-4">
+                                    <div className="flex items-start gap-3">
+                                        <div className="mt-1 bg-blue-100 p-2 rounded-full text-blue-900"><Icons.Award size={20} /></div>
+                                        <div><h4 className="font-bold text-gray-900">Mestre em Manutenção</h4><p className="text-sm text-gray-600">Especialista em equipamentos de salão de alta performance.</p></div>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <div className="mt-1 bg-blue-100 p-2 rounded-full text-blue-900"><Icons.Users size={20} /></div>
+                                        <div><h4 className="font-bold text-gray-900">Líder da Comunidade</h4><p className="text-sm text-gray-600">Mentora centenas de técnicos em todo o Brasil através da Rede.</p></div>
+                                    </div>
+                                </div>
+                                <div className="pt-4">
+                                    <p className="text-xl font-serif italic text-blue-900">"Meu objetivo não é te dar um curso, é te dar uma profissão."</p>
+                                    <p className="text-sm text-gray-500 mt-2">— Rômulo Vander</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
         const LandingPage = ({ scrollToCheckout }) => {
             return (
                 <>
@@ -457,6 +494,9 @@
                             </div>
                         </div>
                     </section>
+
+                    {/* --- AQUI ENTRA O RÔMULO VANDER --- */}
+                    <CreatorSection />
 
                     <section id="oferta" className="py-20 bg-gray-900 border-t border-gray-800">
                         <div className="container mx-auto px-4">
