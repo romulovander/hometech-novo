@@ -128,7 +128,18 @@
                 );
             }
             return (
-                <video key={src} controls={controls} autoPlay={autoPlay} loop muted={false} playsInline className={className} poster={poster} onError={() => setError(true)}>
+                <video 
+                    key={src} 
+                    controls={controls} 
+                    autoPlay={autoPlay} 
+                    loop 
+                    muted={false} 
+                    playsInline 
+                    className={className} 
+                    poster={poster} // Aqui o poster é opcional
+                    onError={() => setError(true)}
+                    preload="auto" // Força o carregamento
+                >
                     <source src={src} type="video/mp4" />
                     Seu navegador não suporta vídeos.
                 </video>
@@ -361,6 +372,7 @@
                                     <span className="bg-red-600/90 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-flex items-center gap-1 shadow-lg shadow-red-900/20 animate-pulse">🔥 Vagas na sua região esgotando</span>
                                 </div>
                                 
+                                {/* FOTO DO TÉCNICO NO MOBILE AGORA É CLICÁVEL E OCUPA LARGURA TOTAL */}
                                 <div className="md:hidden w-full my-6">
                                     {!showVideoHero ? (
                                         <div className="relative group w-full cursor-pointer" onClick={() => setShowVideoHero(true)}>
@@ -375,7 +387,8 @@
                                         </div>
                                     ) : (
                                         <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-700">
-                                            <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO} poster={NOME_FOTO_HERO} className="w-full h-full object-cover" autoPlay={true} />
+                                            {/* SEM POSTER NO VÍDEO ATIVO PARA EVITAR LAG VISUAL */}
+                                            <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO} className="w-full h-full object-cover" autoPlay={true} />
                                         </div>
                                     )}
                                 </div>
@@ -408,6 +421,7 @@
                                 </div>
                             </div>
                             
+                            {/* --- COLUNA DA DIREITA NO DESKTOP/IPAD (MANTIDA IGUAL) --- */}
                             <div className="hidden md:block relative w-full h-full min-h-[500px] flex items-center justify-center">
                                 {!showVideoHero ? (
                                     <div className="relative group w-full max-w-lg mx-auto cursor-pointer" onClick={() => setShowVideoHero(true)}>
@@ -422,7 +436,7 @@
                                     </div>
                                 ) : (
                                     <div className="relative w-full max-w-lg mx-auto aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-700">
-                                        <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO} poster={NOME_FOTO_HERO} className="w-full h-full object-cover" autoPlay={true} />
+                                        <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO} className="w-full h-full object-cover" autoPlay={true} />
                                     </div>
                                 )}
                             </div>
@@ -452,7 +466,8 @@
                             <div className="flex flex-col lg:flex-row gap-16 items-center mb-16">
                                 <div className="lg:w-1/2 w-full">
                                     <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white transform hover:scale-[1.01] transition duration-300 aspect-video">
-                                        <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO_BANCADA} poster={NOME_FOTO_BANCADA} className="w-full h-full object-cover" autoPlay={false} />
+                                        {/* VÍDEO 2 SEM CAPA ESPECÍFICA (VAI MOSTRAR 1º FRAME OU PRETO) */}
+                                        <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO_BANCADA} className="w-full h-full object-cover" autoPlay={false} />
                                         <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-8 w-full pointer-events-none"><p className="text-white font-bold text-xl md:text-2xl">Sua futura estação de trabalho</p></div>
                                     </div>
                                 </div>
@@ -476,11 +491,12 @@
                                     <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center font-bold text-2xl mb-6 shadow-lg border-4 border-gray-900">1</div>
                                     <h3 className="text-2xl font-bold mb-2 text-white">Técnico Fundador</h3>
                                     <p className="text-orange-400 text-sm font-bold mb-6 tracking-wide">FASE ATUAL (0-3 Meses)</p>
-                                    <ul className="space-y-4 text-gray-300 text-base text-left w-full pl-4">
-                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0"/> Aprende a consertar do zero</li>
-                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0"/> <strong>Desconto imediato em peças</strong></li>
-                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0"/> Ganha perfil oficial no site</li>
-                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0"/> Fatura até R$ 4.000/mês</li>
+                                    {/* TEXTO ALINHADO E JUSTIFICADO */}
+                                    <ul className="space-y-4 text-gray-300 text-base text-justify w-full pl-4">
+                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0 mt-1"/> <span>Aprende a consertar do zero</span></li>
+                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0 mt-1"/> <span><strong>Desconto imediato em peças</strong></span></li>
+                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0 mt-1"/> <span>Ganha perfil oficial no site</span></li>
+                                        <li className="flex gap-3"><Icons.CheckCircle size={20} className="text-green-500 flex-shrink-0 mt-1"/> <span>Fatura até R$ 4.000/mês</span></li>
                                     </ul>
                                 </div>
 
@@ -488,10 +504,10 @@
                                     <div className="w-16 h-16 bg-blue-700 rounded-full flex items-center justify-center font-bold text-2xl mb-6 shadow-lg border-4 border-gray-900">2</div>
                                     <h3 className="text-2xl font-bold mb-2 text-white">Especialista Regional</h3>
                                     <p className="text-blue-400 text-sm font-bold mb-6 tracking-wide">MÉDIO PRAZO (3-12 Meses)</p>
-                                    <ul className="space-y-4 text-gray-300 text-base text-left w-full pl-4">
-                                        <li className="flex gap-3"><Icons.TrendingUp size={20} className="text-blue-400 flex-shrink-0"/> Volume maior de clientes</li>
-                                        <li className="flex gap-3"><Icons.Award size={20} className="text-blue-400 flex-shrink-0"/> Selo de Verificação Ouro</li>
-                                        <li className="flex gap-3"><Icons.Star size={20} className="text-blue-400 flex-shrink-0"/> Referência na cidade</li>
+                                    <ul className="space-y-4 text-gray-300 text-base text-justify w-full pl-4">
+                                        <li className="flex gap-3"><Icons.TrendingUp size={20} className="text-blue-400 flex-shrink-0 mt-1"/> <span>Volume maior de clientes</span></li>
+                                        <li className="flex gap-3"><Icons.Award size={20} className="text-blue-400 flex-shrink-0 mt-1"/> <span>Selo de Verificação Ouro</span></li>
+                                        <li className="flex gap-3"><Icons.Star size={20} className="text-blue-400 flex-shrink-0 mt-1"/> <span>Referência na cidade</span></li>
                                     </ul>
                                 </div>
 
@@ -499,10 +515,10 @@
                                     <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center font-bold text-2xl mb-6 shadow-lg border-4 border-gray-900 text-white">3</div>
                                     <h3 className="text-2xl font-bold mb-2 text-white">Supervisor / Franquia</h3>
                                     <p className="text-green-400 text-sm font-bold mb-6 tracking-wide">LONGO PRAZO (Após 1 Ano)</p>
-                                    <ul className="space-y-4 text-gray-300 text-base text-left w-full pl-4">
-                                        <li className="flex gap-3"><Icons.Lock size={20} className="text-green-500 flex-shrink-0"/> <strong>CD Distribuidor na Região</strong></li>
-                                        <li className="flex gap-3"><Icons.Lock size={20} className="text-green-500 flex-shrink-0"/> Gestão de outros técnicos</li>
-                                        <li className="flex gap-3"><Icons.Lock size={20} className="text-green-500 flex-shrink-0"/> Participação nos lucros</li>
+                                    <ul className="space-y-4 text-gray-300 text-base text-justify w-full pl-4">
+                                        <li className="flex gap-3"><Icons.Lock size={20} className="text-green-500 flex-shrink-0 mt-1"/> <span><strong>CD Distribuidor na Região</strong></span></li>
+                                        <li className="flex gap-3"><Icons.Lock size={20} className="text-green-500 flex-shrink-0 mt-1"/> <span>Gestão de outros técnicos</span></li>
+                                        <li className="flex gap-3"><Icons.Lock size={20} className="text-green-500 flex-shrink-0 mt-1"/> <span>Participação nos lucros</span></li>
                                     </ul>
                                 </div>
                             </div>
