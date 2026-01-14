@@ -28,7 +28,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .logo-blend { mix-blend-mode: screen; filter: brightness(1.1); }
         .fade-in { animation: fadeIn 0.3s ease-out; }
@@ -362,7 +362,22 @@
                                 </div>
                                 
                                 <div className="md:hidden w-full max-w-xs rounded-xl overflow-hidden shadow-2xl border-2 border-orange-500/50 my-6">
-                                    <img src={NOME_FOTO_TECNICO_CRACHA} alt="Técnico com Crachá" className="w-full h-auto object-cover" />
+                                    {!showVideoHero ? (
+                                        <div className="relative group w-full cursor-pointer" onClick={() => setShowVideoHero(true)}>
+                                            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-blue-500 rounded-xl blur opacity-40"></div>
+                                            <img src={NOME_FOTO_TECNICO_CRACHA} alt="Técnico com Crachá" className="relative w-full h-auto object-cover rounded-xl shadow-2xl" />
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="bg-white/90 backdrop-blur text-orange-600 p-3 rounded-full shadow-2xl flex items-center gap-2">
+                                                    <Icons.Play size={20} fill="currentColor" />
+                                                    <span className="font-bold text-xs tracking-wide">VER VÍDEO</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-700">
+                                            <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO} poster={NOME_FOTO_HERO} className="w-full h-full object-cover" />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight drop-shadow-lg">Ganhe até <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">R$ 400 por dia</span> consertando secadores na sua casa.</h1>
