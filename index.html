@@ -133,12 +133,12 @@
                     controls={controls} 
                     autoPlay={autoPlay} 
                     loop 
-                    muted={false} 
+                    muted={false} // GARANTE SOM LIGADO
                     playsInline 
                     className={className} 
-                    poster={poster} // Aqui o poster é opcional
+                    poster={poster} // SE UNDEFINED, MOSTRA PRIMEIRO FRAME
+                    preload="metadata" // CARREGA METADADOS PARA MOSTRAR FRAME
                     onError={() => setError(true)}
-                    preload="auto" // Força o carregamento
                 >
                     <source src={src} type="video/mp4" />
                     Seu navegador não suporta vídeos.
@@ -421,7 +421,6 @@
                                 </div>
                             </div>
                             
-                            {/* --- COLUNA DA DIREITA NO DESKTOP/IPAD (MANTIDA IGUAL) --- */}
                             <div className="hidden md:block relative w-full h-full min-h-[500px] flex items-center justify-center">
                                 {!showVideoHero ? (
                                     <div className="relative group w-full max-w-lg mx-auto cursor-pointer" onClick={() => setShowVideoHero(true)}>
@@ -436,7 +435,7 @@
                                     </div>
                                 ) : (
                                     <div className="relative w-full max-w-lg mx-auto aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-700">
-                                        <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO} className="w-full h-full object-cover" autoPlay={true} />
+                                        <SafeVideoPlayer src={NOME_ARQUIVO_VIDEO} poster={NOME_FOTO_HERO} className="w-full h-full object-cover" autoPlay={true} />
                                     </div>
                                 )}
                             </div>
@@ -506,7 +505,7 @@
                                     <p className="text-blue-400 text-sm font-bold mb-6 tracking-wide">MÉDIO PRAZO (3-12 Meses)</p>
                                     <ul className="space-y-4 text-gray-300 text-base text-justify w-full pl-4">
                                         <li className="flex gap-3"><Icons.TrendingUp size={20} className="text-blue-400 flex-shrink-0 mt-1"/> <span>Volume maior de clientes</span></li>
-                                        <li className="flex gap-3"><Icons.Award size={20} className="text-blue-400 flex-shrink-0 mt-1"/> <span>Selo de Verificação Ouro</span></li>
+                                        <li className="flex gap-3"><Icons.Award size={20} className="text-blue-400 flex-shrink-0 mt-1"/> <span>Selos de Verificação Ouro</span></li>
                                         <li className="flex gap-3"><Icons.Star size={20} className="text-blue-400 flex-shrink-0 mt-1"/> <span>Referência na cidade</span></li>
                                     </ul>
                                 </div>
