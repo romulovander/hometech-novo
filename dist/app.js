@@ -1,0 +1,853 @@
+// ==============================================
+// APP.JS - SITE COMPLETO HOMETECH
+// ==============================================
+
+// React já está no escopo global
+const { useState, useEffect, useRef } = React;
+
+// --- CONFIGURAÇÃO ---
+const LINK_DO_CHECKOUT = "https://pay.kiwify.com.br/DMyYat7"; 
+const SEU_WHATSAPP = "553187251057";
+
+// --- ARQUIVOS ---
+const NOME_ARQUIVO_LOGO = "assets/logo-hometech.png"; 
+const NOME_ARQUIVO_VIDEO = "assets/video-capa.mp4";
+const NOME_ARQUIVO_VIDEO_BANCADA = "assets/video-bancada-nova.mp4"; 
+const NOME_FOTO_HERO = "assets/foto-hero.webp";        
+const NOME_FOTO_BANCADA = "assets/foto-bancada.webp"; 
+const NOME_FOTO_DEPOIMENTO = "assets/foto-depoimento.webp"; 
+const NOME_FOTO_ROMULO = "assets/foto-romulo.JPG";
+const NOME_FOTO_TECNICO_CRACHA = "assets/foto-tecnico-cracha.jpg"; 
+
+// --- FALLBACKS ---
+const FALLBACK_IMAGES = {
+    hero_video_poster: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?q=80&w=2070&auto=format&fit=crop",
+    bancada: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop",
+    romulo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2000&auto=format&fit=crop",
+    tecnico_padrao: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=100&auto=format&fit=crop"
+};
+
+// --- MOCK TÉCNICOS ---
+const MOCK_TECNICOS = [
+    { id: 1, nome: "Maria Silva", cidade: "São Paulo", estado: "SP", bairro: "Vila Madalena", avaliacao: 4.9, avaliacoesCount: 47, tempoResposta: "15 min", especialidades: ["Secadores", "Chapinhas"], foto: NOME_FOTO_DEPOIMENTO, whatsapp: "5511999990001" },
+    { id: 2, nome: "João Santos", cidade: "Santo André", estado: "SP", bairro: "Centro", avaliacao: 4.8, avaliacoesCount: 32, tempoResposta: "30 min", especialidades: ["Secadores Profissionais"], foto: "https://randomuser.me/api/portraits/men/32.jpg", whatsapp: "5511999990002" },
+    { id: 3, nome: "Ana Pereira", cidade: "Belo Horizonte", estado: "MG", bairro: "Savassi", avaliacao: 5.0, avaliacoesCount: 15, tempoResposta: "1 hora", especialidades: ["Secadores", "Escovas Rotativas"], foto: "https://randomuser.me/api/portraits/women/44.jpg", whatsapp: "5531999990003" },
+    { id: 4, nome: "Carlos Mendes", cidade: "São Paulo", estado: "SP", bairro: "Mooca", avaliacao: 4.7, avaliacoesCount: 28, tempoResposta: "45 min", especialidades: ["Secadores", "Manutenção Geral"], foto: "https://randomuser.me/api/portraits/men/85.jpg", whatsapp: "5511999990004" }
+];
+
+// --- ICONES ---
+const Icons = {
+    Wrench: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" })
+    ),
+    DollarSign: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('line', { x1: "12", y1: "1", x2: "12", y2: "23" }),
+        React.createElement('path', { d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" })
+    ),
+    CheckCircle: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
+        React.createElement('polyline', { points: "22 4 12 14.01 9 11.01" })
+    ),
+    Play: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('polygon', { points: "5 3 19 12 5 21 5 3" })
+    ),
+    Award: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('circle', { cx: "12", cy: "8", r: "7" }),
+        React.createElement('polyline', { points: "8.21 13.89 7 23 12 20 17 23 15.79 13.88" })
+    ),
+    ArrowRight: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('line', { x1: "5", y1: "12", x2: "19", y2: "12" }),
+        React.createElement('polyline', { points: "12 5 19 12 12 19" })
+    ),
+    Menu: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('line', { x1: "3", y1: "12", x2: "21", y2: "12" }),
+        React.createElement('line', { x1: "3", y1: "6", x2: "21", y2: "6" }),
+        React.createElement('line', { x1: "3", y1: "18", x2: "21", y2: "18" })
+    ),
+    X: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('line', { x1: "18", y1: "6", x2: "6", y2: "18" }),
+        React.createElement('line', { x1: "6", y1: "6", x2: "18", y2: "18" })
+    ),
+    ShieldCheck: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" }),
+        React.createElement('path', { d: "m9 12 2 2 4-4" })
+    ),
+    Smartphone: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('rect', { x: "5", y: "2", width: "14", height: "20", rx: "2", ry: "2" }),
+        React.createElement('line', { x1: "12", y1: "18", x2: "12.01", y2: "18" })
+    ),
+    Lock: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('rect', { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }),
+        React.createElement('path', { d: "M7 11V7a5 5 0 0 1 10 0v4" })
+    ),
+    MapPin: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" }),
+        React.createElement('circle', { cx: "12", cy: "10", r: "3" })
+    ),
+    Search: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('circle', { cx: "11", cy: "11", r: "8" }),
+        React.createElement('line', { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
+    ),
+    Star: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('polygon', { points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" })
+    ),
+    MessageCircle: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" })
+    ),
+    Users: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" }),
+        React.createElement('circle', { cx: "9", cy: "7", r: "4" }),
+        React.createElement('path', { d: "M23 21v-2a4 4 0 0 0-3-3.87" }),
+        React.createElement('path', { d: "M16 3.13a4 4 0 0 1 0 7.75" })
+    ),
+    Clock: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('circle', { cx: "12", cy: "12", r: "10" }),
+        React.createElement('polyline', { points: "12 6 12 12 16 14" })
+    ),
+    Filter: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('polygon', { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" })
+    ),
+    TrendingUp: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('polyline', { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
+        React.createElement('polyline', { points: "17 6 23 6 23 12" })
+    ),
+    User: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" }),
+        React.createElement('circle', { cx: "12", cy: "7", r: "4" })
+    ),
+    ChevronUp: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('polyline', { points: "18 15 12 9 6 15" })
+    ),
+    WhatsApp: (props) => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: 24, height: 24, viewBox: "0 0 24 24", fill: "currentColor", ...props },
+        React.createElement('path', { d: "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" })
+    )
+};
+
+// --- COMPONENTES ---
+
+// SafeVideoPlayer
+const SafeVideoPlayer = ({ src, poster, className, controls = true }) => {
+    const videoRef = useRef(null);
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        const videoElement = videoRef.current;
+        if (!videoElement) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0];
+                if (!entry.isIntersecting) {
+                    if (!videoElement.paused) {
+                        videoElement.pause();
+                    }
+                }
+            },
+            { threshold: 0.5 }
+        );
+        observer.observe(videoElement);
+        return () => {
+            if (videoElement) observer.unobserve(videoElement);
+        };
+    }, []);
+
+    if (error) {
+        return React.createElement('div', { className: `${className} bg-gray-900 flex items-center justify-center relative overflow-hidden` },
+            React.createElement('img', { src: poster, alt: "Bancada de ferramentas e conserto de secadores Hometech", className: "w-full h-full object-cover opacity-60" }),
+            React.createElement('div', { className: "absolute inset-0 flex flex-col items-center justify-center text-white p-4 text-center" },
+                React.createElement(Icons.Play, { size: 48, className: "text-orange-500 mb-2 opacity-80" }),
+                React.createElement('p', { className: "text-sm font-bold" }, "Assista no nosso canal")
+            )
+        );
+    }
+    return React.createElement('video', {
+        ref: videoRef,
+        key: src,
+        controls: controls,
+        loop: true,
+        playsInline: true,
+        className: className,
+        poster: poster,
+        preload: "metadata",
+        onError: () => setError(true)
+    },
+        React.createElement('source', { src: src, type: "video/mp4" }),
+        "Seu navegador não suporta vídeos."
+    );
+};
+
+// PulseButton
+const PulseButton = ({ text, href, onClick, className = "", variant = "orange" }) => {
+    const bgClass = variant === "green" ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700";
+    const pingClass = variant === "green" ? "bg-green-500" : "bg-orange-500";
+    const handleClick = (e) => {
+        if (href && href.includes("SEU-LINK-AQUI")) { e.preventDefault(); alert("Atenção: Link de checkout não configurado."); } else if (onClick) { onClick(e); }
+    };
+    const content = React.createElement(React.Fragment, null,
+        React.createElement('span', { className: `absolute w-full h-full rounded-full opacity-75 animate-ping-subtle ${pingClass}` }),
+        React.createElement('span', { className: "relative text-base md:text-xl uppercase tracking-wide flex items-center gap-2" }, text, React.createElement(Icons.ArrowRight, { size: 20 }))
+    );
+    if (href) return React.createElement('a', { href: href, onClick: handleClick, target: "_blank", rel: "noopener noreferrer", className: `relative inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-5 font-bold text-white transition-all duration-200 rounded-full hover:scale-105 shadow-lg text-center ${bgClass} ${className}` }, content);
+    return React.createElement('button', { onClick: handleClick, className: `relative inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-5 font-bold text-white transition-all duration-200 rounded-full hover:scale-105 shadow-lg text-center ${bgClass} ${className}` }, content);
+};
+
+// BenefitCard
+const BenefitCard = ({ iconName, title, description, step }) => {
+    const Icon = Icons[iconName];
+    return React.createElement('div', { className: "bg-white p-8 rounded-xl shadow-md border-l-4 border-blue-900 hover:shadow-xl transition-shadow duration-300 h-full relative overflow-hidden" },
+        React.createElement('div', { className: "absolute top-0 right-0 bg-blue-100 text-blue-900 font-bold px-4 py-2 rounded-bl-xl text-sm" }, "PASSO ", step),
+        React.createElement('div', { className: "flex items-center gap-4 mb-4" },
+            React.createElement('div', { className: "p-3 bg-blue-100 rounded-lg text-blue-900" }, React.createElement(Icon, { size: 32 })),
+            React.createElement('h3', { className: "text-2xl font-bold text-gray-800" }, title)
+        ),
+        React.createElement('p', { className: "text-gray-600 leading-relaxed text-lg" }, description)
+    );
+};
+
+// BackToTopButton
+const BackToTopButton = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    useEffect(() => {
+        const toggleVisibility = () => { if (window.pageYOffset > 300) setIsVisible(true); else setIsVisible(false); };
+        window.addEventListener("scroll", toggleVisibility);
+        return () => window.removeEventListener("scroll", toggleVisibility);
+    }, []);
+    const scrollToTop = () => { window.scrollTo({ top: 0, behavior: "smooth" }); };
+    if (!isVisible) return null;
+    return React.createElement('button', { onClick: scrollToTop, className: "fixed bottom-6 left-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition z-40 animate-bounce", title: "Voltar ao Topo" },
+        React.createElement(Icons.ChevronUp, { size: 24 })
+    );
+};
+
+// FloatingWhatsApp
+const FloatingWhatsApp = () => {
+    return React.createElement('a', { href: `https://wa.me/${SEU_WHATSAPP}?text=Olá, tenho interesse na Nano Franquia Hometech.`, target: "_blank", rel: "noopener noreferrer", className: "fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:bg-green-600 transition z-50 animate-bounce-gentle flex items-center justify-center", title: "Falar no WhatsApp" },
+        React.createElement(Icons.WhatsApp, { size: 32 })
+    );
+};
+
+// FaqItem
+const FaqItem = ({ question, answer }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    return React.createElement('div', { className: "border-b border-gray-200" },
+        React.createElement('button', { className: "w-full py-6 text-left flex justify-between items-center focus:outline-none", onClick: () => setIsOpen(!isOpen) },
+            React.createElement('span', { className: "font-bold text-gray-900 text-xl" }, question),
+            isOpen ? React.createElement(Icons.X, { className: "text-orange-500" }) : React.createElement(Icons.ArrowRight, { className: "text-blue-900" })
+        ),
+        React.createElement('div', { className: `overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100 pb-6' : 'max-h-0 opacity-0'}` },
+            React.createElement('p', { className: "text-gray-600 text-lg" }, answer)
+        )
+    );
+};
+
+// LeadCaptureForm
+const LeadCaptureForm = () => {
+    const [email, setEmail] = useState("");
+    const [submitted, setSubmitted] = useState(false);
+    const [isSending, setIsSending] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSending(true);
+        try {
+            const response = await fetch("https://formspree.io/f/xpqwvvea", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, origem: "Site Nano Franquia - Lead" }) });
+            if (response.ok) { setSubmitted(true); setEmail(""); } else { alert("Ocorreu um erro ao enviar. Por favor, tente novamente."); }
+        } catch (error) { alert("Erro de conexão. Verifique sua internet."); } finally { setIsSending(false); }
+    };
+
+    if (submitted) return React.createElement('div', { className: "mb-8 p-4 bg-green-50 rounded-lg border border-green-200 text-center fade-in" },
+        React.createElement('p', { className: "text-green-800 font-bold flex items-center justify-center gap-2" },
+            React.createElement(Icons.CheckCircle, { size: 20 }),
+            " Sucesso! Enviamos os detalhes para seu e-mail."
+        )
+    );
+
+    return React.createElement('div', { className: "mb-8 p-6 bg-blue-50 rounded-xl border border-blue-100 text-left" },
+        React.createElement('p', { className: "font-bold text-blue-900 mb-3 text-lg" }, "Ainda não tem certeza? Receba o plano completo:"),
+        React.createElement('form', { onSubmit: handleSubmit, className: "flex flex-col sm:flex-row gap-2" },
+            React.createElement('input', { type: "email", name: "email", placeholder: "Seu melhor email...", className: "flex-1 p-4 rounded border border-gray-300 focus:outline-none focus:border-orange-500 text-lg", required: true, value: email, onChange: (e) => setEmail(e.target.value), disabled: isSending }),
+            React.createElement('button', { type: "submit", disabled: isSending, className: `bg-blue-700 hover:bg-blue-800 text-white px-6 py-4 rounded font-bold transition flex items-center justify-center text-lg ${isSending ? 'opacity-70 cursor-not-allowed' : ''}` },
+                isSending ? 'Enviando...' : 'Quero o PDF'
+            )
+        ),
+        React.createElement('p', { className: "text-sm text-gray-500 mt-2" }, "Sem spam. Apenas conteúdo sobre a franquia.")
+    );
+};
+
+// Modals
+const LoginModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const handleLogin = (e) => { e.preventDefault(); setError(""); setTimeout(() => { setError("Usuário não encontrado ou senha incorreta. Se você já comprou, verifique seu e-mail de boas-vindas."); }, 800); };
+    return React.createElement('div', { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 fade-in backdrop-blur-sm" },
+        React.createElement('div', { className: "bg-white rounded-2xl w-full max-w-md p-8 relative shadow-2xl" },
+            React.createElement('button', { onClick: onClose, className: "absolute top-4 right-4 text-gray-400 hover:text-gray-600" }, React.createElement(Icons.X, { size: 24 })),
+            React.createElement('div', { className: "text-center mb-8" },
+                React.createElement('div', { className: "w-16 h-16 bg-blue-100 text-blue-900 rounded-full flex items-center justify-center mx-auto mb-4" }, React.createElement(Icons.User, { size: 32 })),
+                React.createElement('h3', { className: "text-2xl font-bold text-gray-900" }, "Acesso ao Portal"),
+                React.createElement('p', { className: "text-gray-500 text-sm" }, "Área exclusiva para técnicos certificados")
+            ),
+            React.createElement('form', { onSubmit: handleLogin, className: "space-y-4" },
+                React.createElement('div', null,
+                    React.createElement('label', { className: "block text-xs font-bold text-gray-500 uppercase mb-1" }, "E-mail de Acesso"),
+                    React.createElement('input', { type: "email", className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none", placeholder: "seu@email.com", value: email, onChange: (e) => setEmail(e.target.value), required: true })
+                ),
+                React.createElement('div', null,
+                    React.createElement('label', { className: "block text-xs font-bold text-gray-500 uppercase mb-1" }, "Senha"),
+                    React.createElement('input', { type: "password", className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none", placeholder: "••••••••", value: password, onChange: (e) => setPassword(e.target.value), required: true })
+                ),
+                error && React.createElement('div', { className: "text-red-500 text-sm bg-red-50 p-3 rounded border border-red-100 text-center" }, error),
+                React.createElement('button', { type: "submit", className: "w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition shadow-md" }, "Entrar no Portal")
+            ),
+            React.createElement('div', { className: "mt-6 text-center border-t border-gray-100 pt-4" },
+                React.createElement('p', { className: "text-gray-600 text-sm" }, "Ainda não é um técnico?"),
+                React.createElement('button', { onClick: () => { onClose(); document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' }); }, className: "text-orange-600 font-bold hover:underline mt-1" }, "Torne-se um Fundador Agora")
+            )
+        )
+    );
+};
+
+const TechRegistrationModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    const [formData, setFormData] = useState({ nome: "", cidade: "", whatsapp: "", experiencia: "Sou iniciante" });
+    const [isSending, setIsSending] = useState(false);
+    const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }); };
+    const handleSubmit = async (e) => { e.preventDefault(); setIsSending(true); try { const response = await fetch("https://formspree.io/f/xpqwvvea", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...formData, origem: "Cadastro de Técnico" }) }); if (response.ok) { alert("Pré-cadastro realizado!"); onClose(); setFormData({ nome: "", cidade: "", whatsapp: "", experiencia: "Sou iniciante" }); } else { alert("Erro ao enviar."); } } catch (error) { alert("Erro de conexão."); } finally { setIsSending(false); } };
+    return React.createElement('div', { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 fade-in" },
+        React.createElement('div', { className: "bg-white rounded-2xl w-full max-w-lg p-6 md:p-8 relative max-h-[90vh] overflow-y-auto" },
+            React.createElement('button', { onClick: onClose, className: "absolute top-4 right-4 text-gray-400 hover:text-gray-600" }, React.createElement(Icons.X, { size: 24 })),
+            React.createElement('div', { className: "text-center mb-6" }, React.createElement('h3', { className: "text-2xl font-bold text-gray-900" }, "Cadastro de Técnico")),
+            React.createElement('form', { onSubmit: handleSubmit, className: "space-y-4" },
+                React.createElement('div', null,
+                    React.createElement('label', null, "Nome Completo"),
+                    React.createElement('input', { type: "text", name: "nome", className: "w-full p-3 border rounded", required: true, value: formData.nome, onChange: handleChange })
+                ),
+                React.createElement('div', null,
+                    React.createElement('label', null, "Cidade"),
+                    React.createElement('input', { type: "text", name: "cidade", className: "w-full p-3 border rounded", required: true, value: formData.cidade, onChange: handleChange })
+                ),
+                React.createElement('div', null,
+                    React.createElement('label', null, "WhatsApp"),
+                    React.createElement('input', { type: "tel", name: "whatsapp", className: "w-full p-3 border rounded", required: true, value: formData.whatsapp, onChange: handleChange })
+                ),
+                React.createElement('button', { type: "submit", disabled: isSending, className: "w-full bg-orange-600 text-white font-bold py-4 rounded" }, "Enviar Cadastro")
+            )
+        )
+    );
+};
+
+const SalonRegistrationModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    const [formData, setFormData] = useState({ nomeSalao: "", responsavel: "", cidade: "", whatsapp: "" });
+    const [isSending, setIsSending] = useState(false);
+    const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }); };
+    const handleSubmit = async (e) => { e.preventDefault(); setIsSending(true); try { const response = await fetch("https://formspree.io/f/xpqwvvea", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...formData, origem: "Cadastro de Salão" }) }); if (response.ok) { alert("Cadastro realizado!"); onClose(); setFormData({ nomeSalao: "", responsavel: "", cidade: "", whatsapp: "" }); } else { alert("Erro ao enviar."); } } catch (error) { alert("Erro de conexão."); } finally { setIsSending(false); } };
+    return React.createElement('div', { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 fade-in" },
+        React.createElement('div', { className: "bg-white rounded-2xl w-full max-w-lg p-6 md:p-8 relative max-h-[90vh] overflow-y-auto" },
+            React.createElement('button', { onClick: onClose, className: "absolute top-4 right-4 text-gray-400 hover:text-gray-600" }, React.createElement(Icons.X, { size: 24 })),
+            React.createElement('div', { className: "text-center mb-6" }, React.createElement('h3', { className: "text-2xl font-bold text-gray-900" }, "Cadastro de Salão")),
+            React.createElement('form', { onSubmit: handleSubmit, className: "space-y-4" },
+                React.createElement('div', null,
+                    React.createElement('label', null, "Nome do Salão"),
+                    React.createElement('input', { type: "text", name: "nomeSalao", className: "w-full p-3 border rounded", required: true, value: formData.nomeSalao, onChange: handleChange })
+                ),
+                React.createElement('div', null,
+                    React.createElement('label', null, "WhatsApp"),
+                    React.createElement('input', { type: "tel", name: "whatsapp", className: "w-full p-3 border rounded", required: true, value: formData.whatsapp, onChange: handleChange })
+                ),
+                React.createElement('button', { type: "submit", disabled: isSending, className: "w-full bg-pink-600 text-white font-bold py-4 rounded" }, "Cadastrar Salão")
+            )
+        )
+    );
+};
+
+// --- SEÇÃO "A VERDADE DO MERCADO" ---
+const CreatorSection = () => {
+    return React.createElement('section', { className: "py-24 bg-blue-50 relative overflow-hidden" },
+        React.createElement('div', { className: "container mx-auto px-4 relative z-10" },
+            React.createElement('div', { className: "flex flex-col md:flex-row items-center gap-12" },
+                React.createElement('div', { className: "w-full md:w-1/2 flex justify-center md:justify-end" },
+                    React.createElement('div', { className: "relative group" },
+                        React.createElement('div', { className: "absolute -inset-1 bg-gradient-to-r from-blue-600 to-orange-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000" }),
+                        React.createElement('img', { src: NOME_FOTO_ROMULO, alt: "Rômulo Vander - Fundador e Especialista Hometech", className: "relative w-full max-w-md rounded-2xl shadow-2xl border border-white/50 object-cover", onError: (e) => e.target.src = FALLBACK_IMAGES.romulo }),
+                        React.createElement('div', { className: "absolute bottom-6 right-6 bg-white/90 backdrop-blur text-blue-900 px-6 py-4 rounded-lg shadow-lg" },
+                            React.createElement('p', { className: "font-extrabold text-3xl" }, "200.000+"),
+                            React.createElement('p', { className: "text-sm uppercase font-bold tracking-wider" }, "Aparelhos Reparados")
+                        )
+                    )
+                ),
+                React.createElement('div', { className: "w-full md:w-1/2 text-left space-y-8" },
+                    React.createElement('div', null,
+                        React.createElement('span', { className: "text-orange-600 font-bold tracking-wider uppercase text-sm md:text-base" }, "A Verdade sobre o Mercado"),
+                        React.createElement('h2', { className: "text-4xl md:text-5xl font-extrabold text-gray-900 mt-3 leading-tight" }, "Por que criei a Hometech?")
+                    ),
+                    React.createElement('div', { className: "space-y-6 text-gray-700 text-lg md:text-xl" },
+                        React.createElement('p', { className: "leading-relaxed" },
+                            "Em 25 anos de bancada e 17 milhões faturados, meu problema nunca foi falta de cliente. ", React.createElement('strong', null, "Meu problema era encontrar técnicos.")
+                        ),
+                        React.createElement('div', { className: "space-y-4 pl-6 border-l-4 border-orange-200 py-2" },
+                            React.createElement('p', null, "❌ ", React.createElement('strong', null, "O \"Marido Eletricista\":"), " Tenta consertar em casa, não tem a peça e queima a placa de um secador caro."),
+                            React.createElement('p', null, "❌ ", React.createElement('strong', null, "O Técnico Genérico:"), " Sabe arrumar \"nave espacial\", mas trava no secador porque não conhece os segredos da área."),
+                            React.createElement('p', null, "❌ ", React.createElement('strong', null, "O Salão Desesperado:"), " Me ligava implorando por atendimento e eu tinha que recusar serviço por falta de mão de obra qualificada.")
+                        ),
+                        React.createElement('p', { className: "font-bold text-blue-900 text-xl pt-2" },
+                            "A ficha caiu. O mercado precisa de Especialistas, não de curiosos."
+                        ),
+                        React.createElement('p', { className: "leading-relaxed" },
+                            "Criei a Hometech para resolver essas três dores: te dar a qualificação real, o acesso às peças com preço de fábrica e, o principal:"
+                        ),
+                        React.createElement('div', { className: "bg-white p-6 rounded-xl shadow-sm border border-blue-100" },
+                            React.createElement('p', { className: "font-bold text-gray-900 text-lg flex gap-3 items-center" },
+                                React.createElement(Icons.CheckCircle, { size: 28, className: "text-green-500 flex-shrink-0" }),
+                                " Eu quero te conectar com as demandas lucrativas do mercado dos salões de beleza de todo Brasil."
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    );
+};
+
+// --- LANDING PAGE ---
+const LandingPage = ({ scrollToCheckout }) => {
+    const [showVideoHero, setShowVideoHero] = useState(false);
+
+    const heroSection = React.createElement('section', { className: "relative pt-32 pb-24 md:pt-48 md:pb-40 overflow-hidden" },
+        React.createElement('div', { className: "absolute inset-0 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 z-0" }),
+        React.createElement('div', { className: "absolute inset-0 opacity-10 mix-blend-overlay z-0", style: { backgroundImage: `url(${NOME_FOTO_BANCADA})`, backgroundSize: 'cover', backgroundPosition: 'center' } }),
+        React.createElement('div', { className: "absolute inset-0 opacity-20 z-0", style: { backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "30px 30px" } }),
+        React.createElement('div', { className: "container mx-auto px-4 relative z-10 grid md:grid-cols-2 gap-16 items-center" },
+            React.createElement('div', { className: "text-white space-y-8 text-center md:text-left flex flex-col items-center md:items-start" },
+                React.createElement('div', { className: "flex flex-col gap-3 items-center md:items-start w-full" },
+                    React.createElement('div', { className: "inline-flex items-center gap-2 bg-blue-800/50 border border-blue-700/50 rounded-full px-5 py-2 backdrop-blur-sm" },
+                        React.createElement('span', { className: "relative flex h-3 w-3" },
+                            React.createElement('span', { className: "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" }),
+                            React.createElement('span', { className: "relative inline-flex rounded-full h-3 w-3 bg-green-500" })
+                        ),
+                        React.createElement('p', { className: "text-sm text-blue-100 font-medium" }, "Já formamos 142 técnicos em 27 cidades")
+                    ),
+                    React.createElement('span', { className: "bg-red-600/90 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-flex items-center gap-1 shadow-lg shadow-red-900/20 animate-pulse" }, "🔥 Vagas na sua região esgotando")
+                ),
+                React.createElement('div', { className: "md:hidden w-full my-6" },
+                    !showVideoHero ? React.createElement('div', { className: "relative group w-full cursor-pointer", onClick: () => setShowVideoHero(true) },
+                        React.createElement('div', { className: "absolute -inset-1 bg-gradient-to-r from-orange-500 to-blue-500 rounded-xl blur opacity-40" }),
+                        React.createElement('img', { src: NOME_FOTO_TECNICO_CRACHA, alt: "Técnico com Crachá", className: "relative w-full h-auto object-cover rounded-xl shadow-2xl" }),
+                        React.createElement('div', { className: "absolute inset-0 flex items-center justify-center" },
+                            React.createElement('div', { className: "bg-white/90 backdrop-blur text-orange-600 p-3 rounded-full shadow-2xl flex items-center gap-2" },
+                                React.createElement(Icons.Play, { size: 20, fill: "currentColor" }),
+                                React.createElement('span', { className: "font-bold text-xs tracking-wide" }, "VER VÍDEO")
+                            )
+                        )
+                    ) : React.createElement('div', { className: "relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-700" },
+                        React.createElement(SafeVideoPlayer, { src: NOME_ARQUIVO_VIDEO, className: "w-full h-full object-cover", autoPlay: true })
+                    )
+                ),
+                React.createElement('h1', { className: "text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight drop-shadow-lg" },
+                    "Ganhe até ", React.createElement('span', { className: "text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300" }, "R$ 400 por dia"), " consertando secadores na sua casa."
+                ),
+                React.createElement('div', { className: "text-xl text-blue-100 leading-relaxed max-w-xl font-light" },
+                    React.createElement('p', null,
+                        "O serviço de 20 minutos que paga R$ 80,00. Entre para a ", React.createElement('strong', null, "Hometech"), ", a rede que te capacita e já conecta técnicos a clientes em 27 cidades."
+                    )
+                ),
+                React.createElement('div', { className: "hidden md:flex items-center gap-4 bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10 max-w-lg" },
+                    React.createElement('img', { src: NOME_FOTO_TECNICO_CRACHA, className: "w-20 h-20 rounded-lg object-cover border-2 border-orange-500 shadow-lg", alt: "Técnico Hometech especializado em secadores" }),
+                    React.createElement('div', null,
+                        React.createElement('p', { className: "font-bold text-white text-lg" }, "Comece Imediatamente"),
+                        React.createElement('p', { className: "text-sm text-blue-100" }, "Receba seu crachá e acesso ao portal assim que completar o cadastro.")
+                    )
+                ),
+                React.createElement('div', { className: "bg-white/5 p-8 rounded-2xl border border-white/10 w-full max-w-lg backdrop-blur-sm" },
+                    React.createElement('ul', { className: "space-y-4 text-gray-100 text-base md:text-lg text-left" },
+                        React.createElement('li', { className: "flex gap-4 items-start" },
+                            React.createElement('div', { className: "mt-1 bg-green-500/20 p-1.5 rounded-full" }, React.createElement(Icons.CheckCircle, { className: "text-green-400 w-5 h-5 flex-shrink-0" })),
+                            React.createElement('span', null, React.createElement('strong', null, "Renda Imediata:"), " Fature até R$ 400/dia")
+                        ),
+                        React.createElement('li', { className: "flex gap-4 items-start" },
+                            React.createElement('div', { className: "mt-1 bg-green-500/20 p-1.5 rounded-full" }, React.createElement(Icons.CheckCircle, { className: "text-green-400 w-5 h-5 flex-shrink-0" })),
+                            React.createElement('span', null, React.createElement('strong', null, "Clientes Prontos:"), " Busca nacional")
+                        ),
+                        React.createElement('li', { className: "flex gap-4 items-start" },
+                            React.createElement('div', { className: "mt-1 bg-green-500/20 p-1.5 rounded-full" }, React.createElement(Icons.CheckCircle, { className: "text-green-400 w-5 h-5 flex-shrink-0" })),
+                            React.createElement('span', null, React.createElement('strong', null, "Margem Alta:"), " Peças com desconto")
+                        ),
+                        React.createElement('li', { className: "flex gap-4 items-start" },
+                            React.createElement('div', { className: "mt-1 bg-green-500/20 p-1.5 rounded-full" }, React.createElement(Icons.CheckCircle, { className: "text-green-400 w-5 h-5 flex-shrink-0" })),
+                            React.createElement('span', null, React.createElement('strong', null, "Zero Risco:"), " Para iniciantes")
+                        )
+                    )
+                ),
+                React.createElement('div', { className: "pt-4 flex flex-col items-center md:items-start gap-6 w-full" },
+                    React.createElement(PulseButton, { text: "QUERO ENTENDER COMO GANHAR", onClick: (e) => { e.preventDefault(); document.getElementById('metodo').scrollIntoView({ behavior: 'smooth' }); }, className: "w-full md:w-auto text-lg py-4 md:text-xl md:py-5 shadow-xl shadow-orange-900/20" }),
+                    React.createElement('div', { className: "flex items-center gap-2 text-sm text-blue-200/80 bg-blue-950/50 px-5 py-2.5 rounded-lg border border-blue-900" },
+                        React.createElement(Icons.Clock, { size: 18, className: "text-orange-400 animate-pulse" }),
+                        React.createElement('p', null, "ÚLTIMAS ", React.createElement('strong', null, "17 VAGAS POR CIDADE"), " HOJE")
+                    )
+                )
+            ),
+            React.createElement('div', { className: "hidden md:block relative w-full h-full min-h-[500px] flex items-center justify-center" },
+                !showVideoHero ? React.createElement('div', { className: "relative group w-full max-w-lg mx-auto cursor-pointer", onClick: () => setShowVideoHero(true) },
+                    React.createElement('div', { className: "absolute -inset-1 bg-gradient-to-r from-orange-500 to-blue-500 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-1000" }),
+                    React.createElement('img', { src: NOME_FOTO_TECNICO_CRACHA, alt: "Técnico Hometech especializado", className: "relative w-full rounded-2xl shadow-2xl border-2 border-white/20 object-cover hover:scale-[1.01] transition duration-300" }),
+                    React.createElement('div', { className: "absolute inset-0 flex items-center justify-center" },
+                        React.createElement('div', { className: "bg-white/90 backdrop-blur text-orange-600 p-5 rounded-full shadow-2xl group-hover:scale-110 transition duration-300 flex items-center gap-3" },
+                            React.createElement(Icons.Play, { size: 36, fill: "currentColor" }),
+                            React.createElement('span', { className: "font-bold text-base tracking-wide" }, "VER O VÍDEO")
+                        )
+                    )
+                ) : React.createElement('div', { className: "relative w-full max-w-lg mx-auto aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-700" },
+                    React.createElement(SafeVideoPlayer, { src: NOME_ARQUIVO_VIDEO, poster: NOME_FOTO_HERO, className: "w-full h-full object-cover", autoPlay: true })
+                )
+            )
+        )
+    );
+
+    const comparisonSection = React.createElement('section', { className: "py-24 bg-white" },
+        React.createElement('div', { className: "container mx-auto px-4 max-w-6xl" },
+            React.createElement('div', { className: "text-center mb-16" },
+                React.createElement('h2', { className: "text-4xl md:text-5xl font-extrabold text-gray-900" }, "Por que a Hometech é diferente?"),
+                React.createElement('p', { className: "text-xl text-gray-600 mt-4" }, "Não vendemos apenas informação. Construímos carreiras.")
+            ),
+            React.createElement('div', { className: "overflow-hidden rounded-2xl border border-gray-200 shadow-xl" },
+                React.createElement('div', { className: "grid grid-cols-3 bg-gray-100 p-6 font-bold text-gray-800 text-base md:text-lg" },
+                    React.createElement('div', { className: "text-left pl-4" }, "CRITÉRIO"),
+                    React.createElement('div', { className: "text-center text-gray-500" }, "CURSO COMUM"),
+                    React.createElement('div', { className: "text-center text-orange-600" }, "REDE HOMETECH")
+                ),
+                React.createElement('div', { className: "divide-y divide-gray-200 bg-white text-base md:text-lg" },
+                    React.createElement('div', { className: "grid grid-cols-3 p-6 items-center" },
+                        React.createElement('div', { className: "font-bold text-gray-800 text-left" }, "O que entrega?"),
+                        React.createElement('div', { className: "text-center text-gray-500 text-sm md:text-base" }, "Apenas vídeos"),
+                        React.createElement('div', { className: "text-center text-blue-900 font-bold bg-blue-50 py-2 rounded" }, "Vídeos + Identidade + Rede")
+                    ),
+                    React.createElement('div', { className: "grid grid-cols-3 p-6 items-center" },
+                        React.createElement('div', { className: "font-bold text-gray-800 text-left" }, "Futuro"),
+                        React.createElement('div', { className: "text-center text-gray-500 text-sm md:text-base" }, "Você termina o curso"),
+                        React.createElement('div', { className: "text-center text-blue-900 font-bold bg-blue-50 py-2 rounded" }, "Você começa uma carreira")
+                    ),
+                    React.createElement('div', { className: "grid grid-cols-3 p-6 items-center" },
+                        React.createElement('div', { className: "font-bold text-gray-800 text-left" }, "Visibilidade"),
+                        React.createElement('div', { className: "text-center text-gray-500 text-sm md:text-base" }, "Nenhuma"),
+                        React.createElement('div', { className: "text-center text-blue-900 font-bold bg-blue-50 py-2 rounded" }, "Perfil Oficial no Site")
+                    ),
+                    React.createElement('div', { className: "grid grid-cols-3 p-6 items-center" },
+                        React.createElement('div', { className: "font-bold text-gray-800 text-left" }, "Clientes"),
+                        React.createElement('div', { className: "text-center text-gray-500 text-sm md:text-base" }, "Se vira sozinho"),
+                        React.createElement('div', { className: "text-center text-blue-900 font-bold bg-blue-50 py-2 rounded" }, "Acesso à Rede Nacional")
+                    )
+                )
+            )
+        )
+    );
+
+    const metodoSection = React.createElement('section', { id: "metodo", className: "py-24 bg-gray-100" },
+        React.createElement('div', { className: "container mx-auto px-4" },
+            React.createElement('div', { className: "text-center mb-16" },
+                React.createElement('span', { className: "text-orange-600 font-bold tracking-wider uppercase text-sm md:text-base" }, "Passo a Passo"),
+                React.createElement('h2', { className: "text-4xl md:text-5xl font-extrabold text-gray-900 mt-3" }, "Como você vai ganhar dinheiro")
+            ),
+            React.createElement('div', { className: "flex flex-col lg:flex-row gap-16 items-center mb-16" },
+                React.createElement('div', { className: "lg:w-1/2 w-full" },
+                    React.createElement('div', { className: "relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white transform hover:scale-[1.01] transition duration-300 aspect-video" },
+                        React.createElement(SafeVideoPlayer, { src: NOME_ARQUIVO_VIDEO_BANCADA, poster: NOME_FOTO_BANCADA, className: "w-full h-full object-cover", autoPlay: false }),
+                        React.createElement('div', { className: "absolute bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-8 w-full pointer-events-none" },
+                            React.createElement('p', { className: "text-white font-bold text-xl md:text-2xl" }, "Sua futura estação de trabalho")
+                        )
+                    )
+                ),
+                React.createElement('div', { className: "lg:w-1/2 w-full grid gap-8" },
+                    React.createElement(BenefitCard, { iconName: "DollarSign", step: "1", title: "Comece a Faturar", description: "Com 5 consertos simples por dia, você já coloca R$ 400 no bolso. Isso te dá R$ 2.000 por semana." }),
+                    React.createElement(BenefitCard, { iconName: "Smartphone", step: "2", title: "Aprenda o que dá Lucro", description: "Sem teoria chata. Você aprende direto a trocar o motor e as peças que dão defeito em 90% dos casos." }),
+                    React.createElement(BenefitCard, { iconName: "Wrench", step: "3", title: "Monte sua Bancada em Casa", description: "Não precisa alugar loja. Com ferramentas básicas e uma mesa, sua sala vira sua fonte de renda." }),
+                    React.createElement('div', { className: "mt-6" },
+                        React.createElement(PulseButton, { text: "QUERO COMEÇAR A FATURAR", href: LINK_DO_CHECKOUT, className: "w-full text-lg py-4 md:text-xl md:py-5" })
+                    )
+                )
+            )
+        )
+    );
+
+    const growthSection = React.createElement('section', { className: "py-24 bg-gray-900 text-white" },
+        React.createElement('div', { className: "container mx-auto px-4" },
+            React.createElement('div', { className: "text-center mb-20" },
+                React.createElement('span', { className: "bg-orange-600 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-4" }, "Seu Futuro na Rede"),
+                React.createElement('h2', { className: "text-4xl md:text-5xl font-extrabold" }, "Plano de Crescimento Hometech"),
+                React.createElement('p', { className: "text-gray-400 mt-4 text-xl max-w-3xl mx-auto" }, "Aqui você não para de crescer. Veja onde você pode chegar.")
+            ),
+            React.createElement('div', { className: "grid md:grid-cols-3 gap-10 relative max-w-6xl mx-auto" },
+                React.createElement('div', { className: "hidden md:block absolute top-14 left-0 w-full h-1.5 bg-gradient-to-r from-orange-600 to-green-600 z-0 transform -translate-y-1/2 opacity-30" }),
+                React.createElement('div', { className: "relative z-10 bg-gray-800 p-8 rounded-3xl border-2 border-gray-700 hover:border-orange-500 transition-colors shadow-2xl flex flex-col items-center text-center" },
+                    React.createElement('div', { className: "w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center font-bold text-2xl mb-6 shadow-lg border-4 border-gray-900" }, "1"),
+                    React.createElement('h3', { className: "text-2xl font-bold mb-2 text-white" }, "Técnico Fundador"),
+                    React.createElement('p', { className: "text-orange-400 text-sm font-bold mb-6 tracking-wide" }, "FASE ATUAL (0-3 Meses)"),
+                    React.createElement('ul', { className: "space-y-4 text-gray-300 text-base text-justify w-full pl-4" },
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.CheckCircle, { size: 20, className: "text-green-500 flex-shrink-0 mt-1" }), React.createElement('span', null, "Aprende a consertar do zero")),
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.CheckCircle, { size: 20, className: "text-green-500 flex-shrink-0 mt-1" }), React.createElement('span', null, React.createElement('strong', null, "Desconto imediato em peças"))),
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.CheckCircle, { size: 20, className: "text-green-500 flex-shrink-0 mt-1" }), React.createElement('span', null, "Ganha perfil oficial no site")),
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.CheckCircle, { size: 20, className: "text-green-500 flex-shrink-0 mt-1" }), React.createElement('span', null, "Fatura até R$ 4.000/mês"))
+                    )
+                ),
+                React.createElement('div', { className: "relative z-10 bg-gray-800 p-8 rounded-3xl border-2 border-gray-700 hover:border-blue-500 transition-colors shadow-2xl flex flex-col items-center text-center" },
+                    React.createElement('div', { className: "w-16 h-16 bg-blue-700 rounded-full flex items-center justify-center font-bold text-2xl mb-6 shadow-lg border-4 border-gray-900" }, "2"),
+                    React.createElement('h3', { className: "text-2xl font-bold mb-2 text-white" }, "Especialista Regional"),
+                    React.createElement('p', { className: "text-blue-400 text-sm font-bold mb-6 tracking-wide" }, "MÉDIO PRAZO (3-12 Meses)"),
+                    React.createElement('ul', { className: "space-y-4 text-gray-300 text-base text-justify w-full pl-4" },
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.TrendingUp, { size: 20, className: "text-blue-400 flex-shrink-0 mt-1" }), React.createElement('span', null, "Volume maior de clientes")),
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.Award, { size: 20, className: "text-blue-400 flex-shrink-0 mt-1" }), React.createElement('span', null, "Selos de Verificação Ouro")),
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.Star, { size: 20, className: "text-blue-400 flex-shrink-0 mt-1" }), React.createElement('span', null, "Referência na cidade"))
+                    )
+                ),
+                React.createElement('div', { className: "relative z-10 bg-gray-800 p-8 rounded-3xl border-2 border-green-600/60 hover:border-green-500 transition-colors shadow-2xl flex flex-col items-center text-center" },
+                    React.createElement('div', { className: "w-16 h-16 bg-green-600 rounded-full flex items-center justify-center font-bold text-2xl mb-6 shadow-lg border-4 border-gray-900 text-white" }, "3"),
+                    React.createElement('h3', { className: "text-2xl font-bold mb-2 text-white" }, "Supervisor / Franquia"),
+                    React.createElement('p', { className: "text-green-400 text-sm font-bold mb-6 tracking-wide" }, "LONGO PRAZO (Após 1 Ano)"),
+                    React.createElement('ul', { className: "space-y-4 text-gray-300 text-base text-justify w-full pl-4" },
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.Lock, { size: 20, className: "text-green-500 flex-shrink-0 mt-1" }), React.createElement('span', null, React.createElement('strong', null, "CD Distribuidor na Região"))),
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.Lock, { size: 20, className: "text-green-500 flex-shrink-0 mt-1" }), React.createElement('span', null, "Gestão de outros técnicos")),
+                        React.createElement('li', { className: "flex gap-3" }, React.createElement(Icons.Lock, { size: 20, className: "text-green-500 flex-shrink-0 mt-1" }), React.createElement('span', null, "Participação nos lucros"))
+                    )
+                )
+            )
+        )
+    );
+
+    const ofertaSection = React.createElement('section', { id: "oferta", className: "py-24 bg-gray-900 border-t border-gray-800" },
+        React.createElement('div', { className: "container mx-auto px-4" },
+            React.createElement('div', { className: "max-w-4xl mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl" },
+                React.createElement('div', { className: "bg-orange-600 p-5 text-center" }, React.createElement('span', { className: "text-white font-bold text-xl uppercase tracking-wide" }, "Convite Exclusivo: Kit Fundador")),
+                React.createElement('div', { className: "p-10 md:p-16 text-center" },
+                    React.createElement('h2', { className: "text-4xl md:text-5xl font-extrabold text-gray-900 mb-6" }, "Garanta sua vaga na Rede Nacional"),
+                    React.createElement('p', { className: "text-gray-600 mb-10 text-xl" }, "Tudo o que você precisa para aprender o ofício e começar a faturar imediatamente."),
+                    React.createElement('div', { className: "text-left space-y-5 mb-12 max-w-lg mx-auto text-lg" },
+                        React.createElement('div', { className: "flex items-center gap-4" }, React.createElement(Icons.CheckCircle, { size: 24, className: "text-green-500 flex-shrink-0" }), React.createElement('span', { className: "text-gray-700 font-bold" }, "Treinamento Técnico Completo (R$ 1.997)")),
+                        React.createElement('div', { className: "flex items-center gap-4" }, React.createElement(Icons.MapPin, { size: 24, className: "text-blue-600 flex-shrink-0" }), React.createElement('span', { className: "text-gray-700 font-bold" }, "Perfil Oficial no Site Hometech (Inestimável)")),
+                        React.createElement('div', { className: "flex items-center gap-4" }, React.createElement(Icons.CheckCircle, { size: 24, className: "text-green-500 flex-shrink-0" }), React.createElement('span', { className: "text-gray-700" }, "Acesso a Fornecedores de Peças")),
+                        React.createElement('div', { className: "flex items-center gap-4" }, React.createElement(Icons.CheckCircle, { size: 24, className: "text-green-500 flex-shrink-0" }), React.createElement('span', { className: "text-gray-700" }, "Certificado Digital Reconhecido")),
+                        React.createElement('div', { className: "flex items-center gap-4" }, React.createElement(Icons.Users, { size: 24, className: "text-green-500 flex-shrink-0" }), React.createElement('span', { className: "text-gray-700" }, "Grupo de Suporte Fundadores"))
+                    ),
+                    React.createElement(LeadCaptureForm, null),
+                    React.createElement('div', { className: "mb-10 p-6 bg-blue-50 rounded-2xl border-2 border-blue-100" },
+                        React.createElement('p', { className: "text-gray-500 text-base uppercase mb-2 font-bold tracking-wider" }, "Preço para Membros Fundadores:"),
+                        React.createElement('div', { className: "flex justify-center items-end gap-2 text-blue-900" },
+                            React.createElement('span', { className: "text-3xl font-bold mb-3" }, "12x de"),
+                            React.createElement('span', { className: "text-7xl font-extrabold tracking-tighter" }, "R$ 34,90")
+                        ),
+                        React.createElement('p', { className: "text-gray-600 text-lg mt-2" }, "ou ", React.createElement('strong', null, "R$ 347,00"), " à vista")
+                    ),
+                    React.createElement(PulseButton, { text: "GARANTIR MINHA VAGA DE FUNDADOR", href: LINK_DO_CHECKOUT, className: "w-full md:w-auto text-xl py-5 md:text-2xl md:py-6 shadow-2xl" }),
+                    React.createElement('div', { className: "mt-10 pt-8 border-t border-gray-200" },
+                        React.createElement('div', { className: "flex flex-col items-center gap-4" },
+                            React.createElement('div', { className: "flex items-center justify-center gap-2 text-base text-gray-500 font-medium" },
+                                React.createElement(Icons.Award, { size: 20, className: "text-orange-500" }),
+                                React.createElement('span', null, "Risco Zero: Garantia Incondicional de 7 dias.")
+                            ),
+                            React.createElement('p', { className: "text-xs text-gray-400 mt-2 max-w-sm text-center" }, "Isso não é promessa de renda fixa ou emprego. Os valores apresentados são médias reais de técnicos ativos da rede. Seu resultado depende do seu esforço, disponibilidade e região.")
+                        )
+                    )
+                )
+            )
+        )
+    );
+
+    const faqSection = React.createElement('section', { className: "py-24 bg-white" },
+        React.createElement('div', { className: "container mx-auto px-4 max-w-3xl" },
+            React.createElement('h2', { className: "text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12" }, "Dúvidas Frequentes"),
+            React.createElement('div', { className: "space-y-6" },
+                React.createElement(FaqItem, { question: "Preciso ter experiência anterior?", answer: "Zero. O método foi desenhado para quem nunca abriu um parafuso. Você aprende do básico ao avançado." }),
+                React.createElement(FaqItem, { question: "O que é o Kit Fundador?", answer: "É o pacote completo de entrada na rede: inclui o curso técnico, seu cadastro no site, acesso a peças e suporte." }),
+                React.createElement(FaqItem, { question: "Como recebo clientes pelo site?", answer: "Ao concluir o treinamento, seu perfil é ativado na nossa busca por CEP. Clientes da sua região poderão te encontrar direto no mapa." }),
+                React.createElement(FaqItem, { question: "Tem mensalidade?", answer: "Não. O valor de R$ 347 é único para o acesso vitalício ao treinamento e inclusão na rede nesta fase de fundadores." })
+            )
+        )
+    );
+
+    return React.createElement(React.Fragment, null, heroSection, comparisonSection, metodoSection, growthSection, ofertaSection, faqSection);
+};
+
+// --- TECHNICIANS PAGE ---
+const TechniciansPage = ({ goToHome, openRegistration }) => {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredTechs, setFilteredTechs] = useState(MOCK_TECNICOS);
+    const handleSearch = () => {
+        const term = searchTerm.toLowerCase();
+        const filtered = MOCK_TECNICOS.filter(tech => tech.cidade.toLowerCase().includes(term) || tech.bairro.toLowerCase().includes(term) || tech.estado.toLowerCase().includes(term));
+        setFilteredTechs(filtered);
+    };
+    return React.createElement('div', { className: "pt-24" },
+        React.createElement('section', { className: "bg-blue-900 text-white py-20 md:py-32 relative overflow-hidden" },
+            React.createElement('div', { className: "absolute inset-0 opacity-20", style: { backgroundImage: "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')" } }),
+            React.createElement('div', { className: "container mx-auto px-4 relative z-10 text-center" },
+                React.createElement('h1', { className: "text-4xl md:text-6xl font-extrabold mb-8" }, "Encontre um Técnico Certificado ", React.createElement('span', { className: "text-orange-500" }, "na sua Cidade")),
+                React.createElement('p', { className: "text-xl md:text-2xl text-blue-100 mb-10 max-w-3xl mx-auto" }, "Conserto rápido, peças originais e profissionais treinados pela Hometech."),
+                React.createElement('div', { className: "max-w-2xl mx-auto bg-white p-2 rounded-xl flex shadow-2xl" },
+                    React.createElement('div', { className: "flex items-center pl-4 text-gray-400" }, React.createElement(Icons.MapPin, { size: 24 })),
+                    React.createElement('input', { type: "text", placeholder: "Digite sua cidade (ex: São Paulo, Belo Horizonte...)", className: "flex-1 p-4 text-lg text-gray-800 outline-none rounded-l-lg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), onKeyDown: (e) => e.key === 'Enter' && handleSearch() }),
+                    React.createElement('button', { onClick: handleSearch, className: "bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-lg font-bold transition flex items-center gap-2 text-lg" },
+                        React.createElement(Icons.Search, { size: 24 }),
+                        React.createElement('span', { className: "hidden md:inline" }, "Buscar")
+                    )
+                )
+            )
+        ),
+        React.createElement('section', { className: "py-20 bg-gray-50" },
+            React.createElement('div', { className: "container mx-auto px-4" },
+                React.createElement('div', { className: "flex items-center justify-between mb-10" },
+                    React.createElement('h2', { className: "text-3xl font-bold text-gray-800" }, "Técnicos Recomendados"),
+                    React.createElement('div', { className: "text-base text-gray-500 flex items-center gap-2" },
+                        React.createElement(Icons.Filter, { size: 20 }),
+                        " Mostrando ", filteredTechs.length, " resultados"
+                    )
+                ),
+                React.createElement('div', { className: "grid md:grid-cols-2 lg:grid-cols-3 gap-8" },
+                    filteredTechs.length > 0 ? filteredTechs.map(tech =>
+                        React.createElement('div', { key: tech.id, className: "bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition border border-gray-100" },
+                            React.createElement('div', { className: "p-8" },
+                                React.createElement('div', { className: "flex items-start gap-5 mb-6" },
+                                    React.createElement('img', { src: tech.foto, alt: tech.nome, className: "w-20 h-20 rounded-full object-cover border-2 border-orange-500", onError: (e) => e.target.src = FALLBACK_IMAGES.tecnico_padrao }),
+                                    React.createElement('div', null,
+                                        React.createElement('h3', { className: "font-bold text-2xl text-gray-900" }, tech.nome),
+                                        React.createElement('div', { className: "flex items-center gap-1 text-orange-500 text-base font-bold mt-1" },
+                                            React.createElement(Icons.Star, { size: 16, fill: "currentColor" }),
+                                            " ", tech.avaliacao, " ", React.createElement('span', { className: "text-gray-400 font-normal" }, "(", tech.avaliacoesCount, " avaliações)")
+                                        ),
+                                        React.createElement('div', { className: "flex items-center gap-1 text-gray-500 text-sm mt-1" },
+                                            React.createElement(Icons.MapPin, { size: 16 }),
+                                            " ", tech.cidade, " - ", tech.estado
+                                        )
+                                    )
+                                ),
+                                React.createElement('div', { className: "space-y-4 mb-8" },
+                                    React.createElement('div', { className: "flex items-center gap-3 text-base text-gray-600" },
+                                        React.createElement(Icons.Clock, { size: 20, className: "text-blue-900" }),
+                                        React.createElement('span', null, "Responde em: ", React.createElement('strong', null, tech.tempoResposta))
+                                    ),
+                                    React.createElement('div', { className: "flex flex-wrap gap-2" },
+                                        tech.especialidades.map((esp, idx) =>
+                                            React.createElement('span', { key: idx, className: "bg-blue-50 text-blue-800 text-sm px-3 py-1.5 rounded-full font-medium" }, esp)
+                                        )
+                                    )
+                                ),
+                                React.createElement('a', { href: `https://wa.me/${tech.whatsapp}?text=Olá ${tech.nome}, encontrei seu perfil no site Hometech e preciso de um orçamento.`, target: "_blank", rel: "noopener noreferrer", className: "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition text-lg shadow-md" },
+                                    React.createElement(Icons.MessageCircle, { size: 24 }),
+                                    " Chamar no WhatsApp"
+                                )
+                            ),
+                            React.createElement('div', { className: "bg-gray-50 px-6 py-4 border-t border-gray-100 text-sm text-center text-gray-500 flex justify-center items-center gap-2 font-medium" },
+                                React.createElement(Icons.ShieldCheck, { size: 16, className: "text-green-500" }),
+                                " Técnico Certificado Hometech"
+                            )
+                        )
+                    ) :
+                    React.createElement('div', { className: "col-span-full text-center py-16" },
+                        React.createElement('p', { className: "text-gray-500 text-xl" }, "Nenhum técnico encontrado nesta região."),
+                        React.createElement('button', { onClick: () => { setSearchTerm(""); setFilteredTechs(MOCK_TECNICOS); }, className: "text-orange-600 font-bold mt-4 hover:underline text-lg" }, "Ver todos os técnicos")
+                    )
+                )
+            )
+        ),
+        React.createElement('section', { className: "py-24 bg-orange-600 text-white text-center" },
+            React.createElement('div', { className: "container mx-auto px-4" },
+                React.createElement('h2', { className: "text-4xl md:text-5xl font-extrabold mb-6" }, "Faça parte da Maior Rede de Técnicos do Brasil"),
+                React.createElement('p', { className: "text-xl md:text-2xl mb-10 max-w-3xl mx-auto text-orange-100" }, "Ganhe visibilidade, tenha acesso a clientes qualificados, treinamentos contínuos e descontos em peças."),
+                React.createElement('button', { onClick: openRegistration, className: "bg-white text-orange-600 hover:bg-gray-100 font-bold py-5 px-10 rounded-full shadow-2xl text-xl transition transform hover:scale-105" }, "QUERO SER UM TÉCNICO CERTIFICADO")
+            )
+        )
+    );
+};
+
+// --- MAIN APP ---
+function App() {
+    const [activeTab, setActiveTab] = useState('home');
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isSalonRegistrationOpen, setIsSalonRegistrationOpen] = useState(false);
+    const [logoError, setLogoError] = useState(false);
+    const [logoFooterError, setLogoFooterError] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 50);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToCheckout = () => {
+        setActiveTab('home');
+        setTimeout(() => {
+            const section = document.getElementById('oferta');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    };
+
+    const header = React.createElement('header', { className: `fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-blue-900 shadow-xl py-3' : 'bg-transparent py-6'}` },
+        React.createElement('div', { className: "container mx-auto px-4 flex justify-between items-center" },
+            React.createElement('div', { className: "flex items-center cursor-pointer", onClick: () => setActiveTab('home') },
+                !logoError ?
+                    React.createElement('img', { src: NOME_ARQUIVO_LOGO, alt: "Nano Franquia Hometech", className: `transition-all duration-300 ${scrolled ? 'h-10 md:h-12' : 'h-12 md:h-16'} w-auto object-contain logo-blend`, onError: () => setLogoError(true) }) :
+                    React.createElement('div', { className: "flex items-center gap-2" },
+                        React.createElement('div', { className: "bg-orange-500 p-2 rounded-lg" }, React.createElement(Icons.Wrench, { className: "text-white", size: 28 })),
+                        React.createElement('span', { className: "text-white font-bold text-2xl tracking-tighter" }, "NF HOMETECH")
+                    )
+            ),
+            React.createElement('button', { className: "md:hidden text-white", onClick: () => setIsMenuOpen(!isMenuOpen) }, React.createElement(Icons.Menu, { size: 32 })),
+            React.createElement('nav', { className: "hidden md:flex gap-3 p-1.5 bg-blue-800/50 rounded-full border border-blue-700/50 items-center backdrop-blur-md" },
+                React.createElement('button', { onClick: () => setActiveTab('home'), className: `px-6 py-2.5 rounded-full text-sm font-bold transition-all ${activeTab === 'home' ? 'bg-orange-600 text-white shadow-lg transform scale-105' : 'text-blue-100 hover:text-white hover:bg-blue-700'}` }, "Seja um Fundador"),
+                React.createElement('button', { onClick: () => setActiveTab('tecnicos'), className: `px-6 py-2.5 rounded-full text-sm font-bold transition-all ${activeTab === 'tecnicos' ? 'bg-orange-600 text-white shadow-lg transform scale-105' : 'text-blue-100 hover:text-white hover:bg-blue-700'}` }, "Encontrar Técnico"),
+                React.createElement('button', { onClick: () => setIsSalonRegistrationOpen(true), className: "px-6 py-2.5 rounded-full text-sm font-bold text-blue-100 hover:text-white hover:bg-blue-700 flex items-center gap-2" }, "Sou Salão"),
+                React.createElement('button', { onClick: () => setIsLoginOpen(true), className: "px-6 py-2.5 rounded-full text-sm font-bold text-blue-100 hover:text-white hover:bg-blue-700 flex items-center gap-2" }, React.createElement(Icons.User, { size: 18 }), " Área do Aluno")
+            ),
+            React.createElement('button', { onClick: scrollToCheckout, className: "hidden md:block bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-full font-bold transition text-base shadow-lg hover:shadow-orange-500/50 transform hover:-translate-y-0.5" }, "Entrar Agora")
+        ),
+        isMenuOpen && React.createElement('div', { className: "md:hidden bg-blue-900 absolute w-full p-6 flex flex-col gap-6 shadow-2xl border-t border-blue-800" },
+            React.createElement('button', { onClick: () => { setIsLoginOpen(true); setIsMenuOpen(false); }, className: "text-left text-xl font-bold py-3 px-6 rounded-xl w-full text-white bg-blue-800/50 flex items-center gap-3" }, React.createElement(Icons.User, { size: 24 }), " Área do Aluno"),
+            React.createElement('button', { onClick: () => { setActiveTab('home'); setIsMenuOpen(false); }, className: `text-left text-xl font-bold py-3 px-6 rounded-xl w-full ${activeTab === 'home' ? 'bg-blue-800 text-orange-400 border border-blue-700' : 'text-white'}` }, "Quero ser Fundador"),
+            React.createElement('button', { onClick: () => { setActiveTab('tecnicos'); setIsMenuOpen(false); }, className: `text-left text-xl font-bold py-3 px-6 rounded-xl w-full ${activeTab === 'tecnicos' ? 'bg-blue-800 text-orange-400 border border-blue-700' : 'text-white'}` }, "Encontrar Técnico"),
+            React.createElement('button', { onClick: () => { setIsSalonRegistrationOpen(true); setIsMenuOpen(false); }, className: "text-left text-xl font-bold py-3 px-6 rounded-xl w-full text-white" }, "Sou Salão"),
+            React.createElement('button', { onClick: () => { scrollToCheckout(); setIsMenuOpen(false); }, className: "bg-orange-600 text-white py-4 rounded-xl font-bold w-full mt-2 text-lg shadow-lg" }, "Quero Minha Vaga")
+        )
+    );
+
+    const footer = React.createElement('footer', { className: "bg-gray-900 text-gray-400 py-12 border-t border-gray-800" },
+        React.createElement('div', { className: "container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8" },
+            React.createElement('div', { className: "flex items-center cursor-pointer", onClick: () => setActiveTab('home') },
+                !logoFooterError ?
+                    React.createElement('img', { src: NOME_ARQUIVO_LOGO, alt: "Nano Franquia Hometech", className: "h-10 md:h-14 w-auto object-contain logo-blend opacity-90", onError: () => setLogoFooterError(true) }) :
+                    React.createElement('div', { className: "flex items-center gap-3" },
+                        React.createElement(Icons.Wrench, { className: "text-orange-600", size: 24 }),
+                        React.createElement('span', { className: "text-white font-bold text-xl" }, "NF HOMETECH")
+                    )
+            ),
+            React.createElement('div', { className: "text-base text-center md:text-right space-y-2" },
+                React.createElement('p', null, "© 2024 Nano Franquia Hometech. Todos os direitos reservados."),
+                React.createElement('p', { className: "text-gray-500" }, "CNPJ: 50.437.828/0001-80 | Contato: suporte@hometech.com.br")
+            )
+        )
+    );
+
+    return React.createElement('div', { className: "font-sans text-gray-900 bg-gray-50 min-h-screen flex flex-col" },
+        React.createElement(TechRegistrationModal, { isOpen: isRegistrationOpen, onClose: () => setIsRegistrationOpen(false) }),
+        React.createElement(LoginModal, { isOpen: isLoginOpen, onClose: () => setIsLoginOpen(false) }),
+        React.createElement(SalonRegistrationModal, { isOpen: isSalonRegistrationOpen, onClose: () => setIsSalonRegistrationOpen(false) }),
+        React.createElement(BackToTopButton, null),
+        React.createElement(FloatingWhatsApp, null),
+        header,
+        React.createElement('main', null,
+            activeTab === 'home' ?
+                React.createElement(LandingPage, { scrollToCheckout: scrollToCheckout }) :
+                React.createElement(TechniciansPage, { goToHome: () => { setActiveTab('home'); setTimeout(() => scrollToCheckout(), 100); }, openRegistration: () => setIsRegistrationOpen(true) })
+        ),
+        footer
+    );
+}
+
+// --- RENDER ---
+const rootElement = document.getElementById('root');
+if (rootElement) {
+    ReactDOM.render(React.createElement(App), rootElement);
+    console.log('✅ Site Hometech completo renderizado com sucesso!');
+} else {
+    console.error('❌ Elemento #root não encontrado!');
+}
